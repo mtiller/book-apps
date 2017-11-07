@@ -3,6 +3,7 @@ import * as ReactDOM from 'react-dom';
 import { BookApp } from './book-app';
 import * as template from 'url-template';
 import { Siren, Link } from 'siren-types';
+import { Details } from './details';
 
 import * as debug from 'debug';
 const appDebug = debug("mbe:book-app");
@@ -81,6 +82,7 @@ async function updateFigures() {
         }
         let ract = actions[rindex];
         appDebug("  Fetched data: %o", modelData);
+        let details = modelData.properties as Details;
         // Remove the original figure
         data.parent.removeChild(fig);
         // Create a new element to mount our React component in
@@ -88,7 +90,7 @@ async function updateFigures() {
         // Add the new element to the original parent
         data.parent.appendChild(elem);
         // Mount the React component on the new element
-        ReactDOM.render(<BookApp desc={desc || data.id} id={data.id} src={data.src} action={ract} />, elem);
+        ReactDOM.render(<BookApp desc={desc || data.id} id={data.id} src={data.src} action={ract} details={details} />, elem);
       });
     }
   } catch (e) {
