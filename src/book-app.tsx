@@ -1,10 +1,13 @@
 import * as React from 'react';
 import { observer } from 'mobx-react';
+import { Action } from 'siren-types';
 import { observable } from 'mobx';
 
 export interface BookAppProps {
     src: string;
     id: string;
+    desc: string;
+    action: Action;
 }
 
 @observer
