@@ -20,7 +20,7 @@ export class BookApp extends React.Component<BookAppProps, {}> {
         return (
             <div className="figure">
                 <div className="ui segment tight left-justified">
-                    <div className="ui fluid accordion">
+                    <div className="ui fluid accordion" style={{ marginBottom: "2px" }}>
                         <div className={"title" + (this.open ? " active" : "")}>
                             <i className="dropdown icon" onClick={() => this.open = !this.open}></i>
                             Simulate <code>RLC1</code> in your browser
