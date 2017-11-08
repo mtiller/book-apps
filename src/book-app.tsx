@@ -1,8 +1,18 @@
 import * as React from 'react';
 import { observer } from 'mobx-react';
-import { Action } from 'siren-types';
+import { Siren, Action } from 'siren-types';
 import { observable } from 'mobx';
 import { Details } from './details';
+import { computed } from 'mobx';
+import { PlotViewer, Descriptions } from './plot-viewer';
+
+import * as debug from 'debug';
+const appDebug = debug("mbe:book-app");
+appDebug.enabled = true;
+
+export type Success = { type: "success", results: Results };
+export type Failure = { type: "failure", log: string };
+export type Outcome = Success | Failure;
 
 export interface BookAppProps {
     src: string;
@@ -22,16 +32,50 @@ function defaultParameters(details: Details): { [id: string]: string } {
     return ret;
 }
 
+type Results = { [id: string]: number[] | number };
 @observer
 export class BookApp extends React.Component<BookAppProps, {}> {
     @observable private running = false;
     @observable private open = false;
     @observable private parameters: { [id: string]: string };
-    simulate = async () => {
+    @observable private outcome: Outcome | null = null;
+    @computed private get results(): Results | null {
+        if (this.outcome && this.outcome.type === "success") return this.outcome.results;
+        return null;
+    }
+    @computed private get error(): string | null {
+        if (this.outcome && this.outcome.type === "failure") return this.outcome.log;
+        return null;
+    }
+    @computed private get descriptions(): Descriptions {
+        if (!this.results) return {};
+        if (!this.props.details.casedata) return {};
+        let ret: Descriptions = {};
+        for (let v of this.props.details.casedata.vars) {
+            ret[v.name] = v.legend;
+        }
+        appDebug("Descriptions: %o", ret);
+        return ret;
+    }
+    @computed private get verticalAlign(): "top" | "middle" | "bottom" {
+        if (!this.props.details.casedata) return "top";
+        let loc = this.props.details.casedata.legloc;
+        if (loc.startsWith("upper") || loc.startsWith("top")) return "top";
+        if (loc.startsWith("lower") || loc.startsWith("bottom")) return "bottom";
+        return "top";
+    }
+    @computed private get horizontalAlign(): "left" | "center" | "right" {
+        if (!this.props.details.casedata) return "right";
+        let loc = this.props.details.casedata.legloc;
+        if (loc.endsWith("left")) return "left";
+        if (loc.endsWith("right")) return "right";
+        return "right";
+    }
+    private simulate = async () => {
         this.running = true;
         let payload: { [id: string]: number } = {};
-        console.log("Simulating " + this.props.id);
-        console.log("Should POST to ", this.props.action.href);
+        appDebug("Simulating %s", this.props.id);
+        appDebug("Should POST to %s", this.props.action.href);
         Object.keys(this.parameters).forEach((param) => {
             payload[param] = +this.parameters[param];
         });
@@ -39,13 +83,35 @@ export class BookApp extends React.Component<BookAppProps, {}> {
             console.warn("No URL to submit simulation POST request to");
             return;
         }
-        console.log("Payload = ", payload);
+        appDebug("Payload = %o", payload);
         let resp = await fetch(this.props.action.href, {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
             method: "POST",
             body: JSON.stringify(payload),
         });
-        let obj = await resp.json();
-        console.log("obj = ", obj);
+        let obj = await resp.json() as Siren;
+        let classes = obj.class || ["unknown"];
+        let props: { stdout?: string, trajectories?: Results } = obj.properties || {};
+        appDebug("Siren response: %o", obj);
+        if (classes[0] === "error") {
+            this.outcome = {
+                type: "failure",
+                log: props.stdout,
+            } as Failure;
+        } else if (classes[0] === "result") {
+            this.outcome = {
+                type: "success",
+                results: props.trajectories,
+            } as Success;
+        } else {
+            this.outcome = {
+                type: "failure",
+                log: "Unrecognized response from server: " + JSON.stringify(obj),
+            };
+        }
         this.running = false;
     }
     constructor(props: BookAppProps, context?: {}) {
@@ -54,10 +120,29 @@ export class BookApp extends React.Component<BookAppProps, {}> {
     }
     render() {
         let parameters = this.props.details.categories.parameter || [];
+
+        let results: Results | null = null;
+        if (this.results && this.props.details.casedata) {
+            results = { ...this.results };
+            let keys = Object.keys(results);
+            appDebug("Keys in results: %o", keys);
+            appDebug("Vars in casedata: %o", this.props.details.casedata.vars);
+            for (let key of keys) {
+                if (key === "time") {
+                    continue;
+                }
+                if (this.props.details.casedata.vars.some((v) => v.name === key)) {
+                    appDebug("  Found %s in casedata, keeping", key);
+                } else {
+                    appDebug("  Did not find %s in casedata, removing", key);
+                    delete results[key];
+                }
+            }
+        }
         return (
             <div className="figure">
                 <div className="ui segment tight left-justified">
-                    <div className="ui fluid accordion" style={{ marginBottom: "2px" }}>
+                    <div className="ui accordion" style={{ width: "800px", marginBottom: "2px" }}>
                         <div className={"title" + (this.open ? " active" : "")}>
                             <i className="dropdown icon" onClick={() => this.open = !this.open}></i>
                             Simulate <code>{this.props.id}</code> in your browser
@@ -71,7 +156,6 @@ export class BookApp extends React.Component<BookAppProps, {}> {
                             </div>
 
                             <div className="ui form small attached fluid segment" id={"form-" + this.props.id}>
-
                                 {parameters.map((param) => {
                                     let v = this.props.details.vars[param];
                                     return (
@@ -94,14 +178,22 @@ export class BookApp extends React.Component<BookAppProps, {}> {
                             </div>
                         </div>
 
-                    </div>
-                    <div id={"plot-wrapper-" + this.props.id}>
-                        <img className="interactive" src={this.props.src} />
-                    </div>
-                    <h2 id={"plot-title-" + this.props.id} style={{ textAlign: "center" }}></h2>
-                    <div id={"dyn-plot-RLC1" + this.props.id} style={{ marginLeft: "auto", marginRight: "auto" }}>
+                        {results == null && this.error == null && <div id={"plot-wrapper-" + this.props.id} style={{ width: "640px", marginLeft: "auto", marginRight: "auto" }}>
+                            <img className="interactive" src={this.props.src} />
+                        </div>}
+                        <h2 id={"plot-title-" + this.props.id} style={{ textAlign: "center" }}></h2>
+                        {this.error && <div style={{ width: "640px", marginLeft: "auto", marginRight: "auto", paddingBottom: "20px", overflow: "scroll" }}>
+                            <h4>Error simulating {this.props.id}</h4>
+                            <pre style={{ color: "red" }}>{this.error}</pre>
+                        </div>}
+                        {results && <div id={"dyn-plot-RLC1" + this.props.id}
+                            style={{ width: "640px", marginLeft: "auto", marginRight: "auto", paddingBottom: "20px" }}>
+                            <PlotViewer xvar="time" results={results} descriptions={this.descriptions}
+                                legendVerticalAlign={this.verticalAlign} ylabel={this.props.details.casedata.ylabel}
+                                title={this.props.details.casedata ? this.props.details.casedata.title : this.props.details.desc.description} />
+                        </div>}
                     </div>
                 </div>
-            </div>);
+            </div >);
     }
 }

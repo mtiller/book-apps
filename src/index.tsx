@@ -6,7 +6,7 @@ import { Siren, Link } from 'siren-types';
 import { Details } from './details';
 
 import * as debug from 'debug';
-const appDebug = debug("mbe:book-app");
+const appDebug = debug("mbe:page-init");
 appDebug.enabled = true;
 
 // Find all elements that have the "interactive" class
@@ -18,7 +18,12 @@ async function updateFigures() {
   // First, contact the API and get the URL template
   try {
     appDebug("Fetching API root URL at %s", ServerURL);
-    let resp = await fetch(ServerURL);
+    let resp = await fetch(ServerURL, {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+    });
     let api = await resp.json() as Siren;
     let links = api.links || [];
     appDebug("api = %o", api);
