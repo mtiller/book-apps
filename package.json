@@ -9,6 +9,7 @@
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
     "react-scripts-ts": "2.8.0",
+    "recharts": "^1.0.0-beta.1",
     "siren-types": "^0.2.3",
     "url-template": "^2.0.8"
   },
@@ -24,6 +25,7 @@
     "@types/node": "^8.0.50",
     "@types/react": "16.0.20",
     "@types/react-dom": "^16.0.2",
+    "@types/recharts": "^1.0.4",
     "@types/url-template": "^2.0.28"
   }
 }
