@@ -15,7 +15,7 @@
             true,
             "check-space"
         ],
-        "curly": true,
+        "curly": false,
         "eofline": false,
         "forin": true,
         "indent": [
@@ -34,7 +34,6 @@
         "max-line-length": false,
         "member-ordering": [
             true,
-            "public-before-private",
             "static-before-instance",
             "variables-before-functions"
         ],
