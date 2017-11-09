@@ -43,14 +43,6 @@ async function updateFigures() {
       // Extract the element
       let fig = figures[i];
 
-      // See if it has a "data-model" attribute
-      let model = fig.attributes.getNamedItem("data-model");
-      // Check to make sure there is actual data there
-      if (!model || !model.nodeValue) {
-        console.warn("No data-model attribute found for figure, skipping");
-        continue;
-      }
-
       // See if it has a "src" attribute
       let src = fig.attributes.getNamedItem("src");
       // Make sure it has a value
@@ -58,6 +50,9 @@ async function updateFigures() {
         console.warn("No source for original plot, skipping");
         continue;
       }
+
+      let parts = src.nodeValue.split("/");
+      let model = parts[parts.length - 1].replace(".png", "");
 
       // Find the parent
       let parent = fig.parentElement;
@@ -69,11 +64,11 @@ async function updateFigures() {
 
       let data = {
         parent: parent,
-        id: model.nodeValue,
+        id: model,
         src: src.nodeValue,
       };
 
-      let url = tmpl.expand({ model: model.nodeValue });
+      let url = tmpl.expand({ model: model });
       appDebug("fetching model @ URL = %s", url);
       fetch(url).then(async (mresp) => {
         appDebug("  Fetched model %s", data.id);
