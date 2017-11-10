@@ -60,7 +60,7 @@ export class PlotViewer extends React.Component<PlotViewerProps, {}> {
         return (
             <div>
                 <h2 style={{ textAlign: "center" }}>{this.props.title}</h2>
-                <div style={{ border: "1px solid black" }}>
+                <div style={{ marginLeft: "auto", marginRight: "auto", border: "1px solid black" }}>
                     <LineChart
                         width={600}
                         height={400}

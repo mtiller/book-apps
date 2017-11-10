@@ -120,6 +120,7 @@ export class BookApp extends React.Component<BookAppProps, {}> {
     }
     render() {
         let parameters = this.props.details.categories.parameter || [];
+        let nchar = parameters.reduce((a, p) => Math.max(a, p.length), 0);
 
         let results: Results | null = null;
         if (this.results && this.props.details.casedata) {
@@ -142,10 +143,10 @@ export class BookApp extends React.Component<BookAppProps, {}> {
         return (
             <div className="figure">
                 <div className="ui segment tight left-justified">
-                    <div className="ui accordion" style={{ width: "800px", marginBottom: "2px" }}>
-                        <div className={"title" + (this.open ? " active" : "")} onClick={() => this.open = !this.open}>
+                    <div className="ui accordion" style={{ width: "100%", marginBottom: "2px", display: "flex", justifyContent: "space-around", flexWrap: "wrap" }}>
+                        <div style={{ width: "100%" }} className={"title" + (this.open ? " active" : "")} onClick={() => this.open = !this.open}>
                             <i className="dropdown icon"></i>
-                            Simulate <code>{this.props.id}</code> in your browser
+                            Run <code>{this.props.id}</code> model interactively
                         </div>
                         <div className={"content left-justified" + (this.open ? " active" : "")}>
                             <div className="ui attached message">
@@ -161,7 +162,7 @@ export class BookApp extends React.Component<BookAppProps, {}> {
                                     return (
                                         <div key={param} className="inline field paramrow">
                                             <label className="paramname"
-                                                style={{ width: "200px", textAlign: "right" }}>
+                                                style={{ width: `${nchar + 2}em`, textAlign: "right" }}>
                                                 {v.name}
                                             </label>
                                             <input className="paramvalue" placeholder="Initial value"
@@ -178,16 +179,15 @@ export class BookApp extends React.Component<BookAppProps, {}> {
                             </div>
                         </div>
 
-                        {results == null && this.error == null && <div id={"plot-wrapper-" + this.props.id} style={{ width: "640px", marginLeft: "auto", marginRight: "auto" }}>
+                        {results == null && this.error == null && <div id={"plot-wrapper-" + this.props.id} style={{ width: "640px", margin: "4px" }}>
                             <img className="interactive" src={this.props.src} />
                         </div>}
-                        <h2 id={"plot-title-" + this.props.id} style={{ textAlign: "center" }}></h2>
-                        {this.error && <div style={{ width: "640px", marginLeft: "auto", marginRight: "auto", paddingBottom: "20px", overflow: "scroll" }}>
+                        {this.error && <div style={{ width: "640px", margin: "4px", paddingBottom: "20px", overflow: "scroll" }}>
                             <h4>Error simulating {this.props.id}</h4>
                             <pre style={{ color: "red" }}>{this.error}</pre>
                         </div>}
                         {results && <div id={"dyn-plot-RLC1" + this.props.id}
-                            style={{ width: "640px", marginLeft: "auto", marginRight: "auto", paddingBottom: "20px" }}>
+                            style={{ width: "640px", margin: "4px", paddingBottom: "20px" }}>
                             <PlotViewer xvar="time" results={results} descriptions={this.descriptions}
                                 legendVerticalAlign={this.verticalAlign} ylabel={this.props.details.casedata.ylabel}
                                 title={this.props.details.casedata ? this.props.details.casedata.title : this.props.details.desc.description} />
