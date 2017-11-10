@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 
 import * as debug from 'debug';
 const plotDebug = debug("mbe:plot");
-plotDebug.enabled = true;
+// plotDebug.enabled = true;
 
 export type Results = { [id: string]: number[] | number };
 export type Descriptions = { [id: string]: string };

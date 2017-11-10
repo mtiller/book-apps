@@ -7,7 +7,7 @@ import { Details } from './details';
 
 import * as debug from 'debug';
 const appDebug = debug("mbe:page-init");
-appDebug.enabled = true;
+// appDebug.enabled = true;
 
 // Find all elements that have the "interactive" class
 let figures = document.getElementsByClassName("interactive");

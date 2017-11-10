@@ -8,7 +8,7 @@ import { PlotViewer, Descriptions } from './plot-viewer';
 
 import * as debug from 'debug';
 const appDebug = debug("mbe:book-app");
-appDebug.enabled = true;
+// appDebug.enabled = true;
 
 export type Success = { type: "success", results: Results };
 export type Failure = { type: "failure", log: string };
