@@ -143,8 +143,8 @@ export class BookApp extends React.Component<BookAppProps, {}> {
             <div className="figure">
                 <div className="ui segment tight left-justified">
                     <div className="ui accordion" style={{ width: "800px", marginBottom: "2px" }}>
-                        <div className={"title" + (this.open ? " active" : "")}>
-                            <i className="dropdown icon" onClick={() => this.open = !this.open}></i>
+                        <div className={"title" + (this.open ? " active" : "")} onClick={() => this.open = !this.open}>
+                            <i className="dropdown icon"></i>
                             Simulate <code>{this.props.id}</code> in your browser
                         </div>
                         <div className={"content left-justified" + (this.open ? " active" : "")}>
