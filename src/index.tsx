@@ -4,15 +4,36 @@ import { BookApp } from './book-app';
 import * as template from 'url-template';
 import { Siren, Link } from 'siren-types';
 import { Details } from './details';
+import { Sponsors, SponsorView } from './sponsors';
 
 import * as debug from 'debug';
 const appDebug = debug("mbe:page-init");
-// appDebug.enabled = true;
+appDebug.enabled = true;
 
 // Find all elements that have the "interactive" class
 let figures = document.getElementsByClassName("interactive");
+let sponsors = document.getElementById("sponsors");
 
 export const ServerURL = "http://modelica.university:3000";
+export const SponsorURL = "/_static/sponsors/sponsors.json";
+
+async function showSponsors() {
+  if (!sponsors) {
+    appDebug("No sponsor element found on this page");
+    return;
+  }
+  appDebug("Fetching sponsorship data");
+  let resp = await fetch(SponsorURL, {
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+  });
+  appDebug("  Sponsorship data fetched");
+  let data = await resp.json() as Sponsors;
+  appDebug("  Data = %o", data);
+  ReactDOM.render(<SponsorView sponsors={data} logoTemplate="/_static/sponsors/{sponsor}/{logo}" />, sponsors);
+}
 
 async function updateFigures() {
   // First, contact the API and get the URL template
@@ -99,3 +120,4 @@ async function updateFigures() {
 }
 
 updateFigures();
+showSponsors();

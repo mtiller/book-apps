@@ -33,6 +33,7 @@ function defaultParameters(details: Details): { [id: string]: string } {
 }
 
 type Results = { [id: string]: number[] | number };
+
 @observer
 export class BookApp extends React.Component<BookAppProps, {}> {
     @observable private running = false;
