@@ -1,0 +1,27 @@
+Gold
+----
+CyDesign - Done
+Wolfram Research - Done
+Modelon - Done
+Maplesoft - Done
+Dassault Systèmes - **Missing**
+
+Silver
+------
+
+Ricardo Software - Done
+ITI - Done
+Modelica Association - **Missing**
+Global Crown Technology - Done
+LMS Imagine - Done
+
+
+Bronze
+------
+
+Suzhou Tongyuan - Done
+OSMC - **No profile**
+DOFWare - Done
+Bausch-Gall - Done
+TUHH/TuTech - Done
+Schlegel Simulation - Done
