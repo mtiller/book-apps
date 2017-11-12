@@ -1,5 +1,7 @@
 import * as React from 'react';
 import * as template from 'url-template';
+import { observable } from 'mobx';
+import { observer } from 'mobx-react';
 
 export interface SponsorData {
     name: string;
@@ -27,6 +29,8 @@ export interface SponsorRowProps {
     width: number;
     sponsors: SponsorData[];
     logoUrl: (sponsor: string, logo: string) => string;
+    onEnter: (sponsor: SponsorData, id: string) => void;
+    onLeave: () => void;
 }
 
 export class SponsorRow extends React.Component<SponsorRowProps, {}> {
@@ -38,17 +42,34 @@ export class SponsorRow extends React.Component<SponsorRowProps, {}> {
                 </span>
                 {this.props.sponsors.map((sponsor, i) => {
                     return (
-                        <div key={sponsor.name} className="blue item level" style={{ display: "flex", flexDirection: "column", justifyContent: "space-around", marginLeft: "5px", marginRight: "5px" }}>
-                            <img className="thumbnail thumbshadow" width={this.props.width} src={this.props.logoUrl(this.props.ids[i], sponsor.logo)} />
+                        <div key={sponsor.name} className="blue item level" onMouseEnter={() => this.props.onEnter(sponsor, this.props.ids[i])} onMouseLeave={this.props.onLeave}
+                            style={{ display: "flex", flexDirection: "column", justifyContent: "space-around", marginLeft: "5px", marginRight: "5px" }}>
+                            <a href={sponsor.link}>
+                                <img className="thumbnail thumbshadow" width={this.props.width}
+                                    src={this.props.logoUrl(this.props.ids[i], sponsor.logo)} />
+                            </a>
                         </div>);
                 })}
             </div>);
     }
 }
 
+@observer
 export class SponsorView extends React.Component<SponsorViewProps, {}> {
+    @observable private current: SponsorData | null = null;
+    @observable private currentId: string | null = null;
+
     constructor(props: SponsorViewProps, context?: {}) {
         super(props, context);
+    }
+
+    enter = (sponsor: SponsorData, id: string): void => {
+        this.current = sponsor;
+        this.currentId = id;
+    }
+
+    leave = (): void => {
+        // this.current = null;
     }
 
     render() {
@@ -63,10 +84,15 @@ export class SponsorView extends React.Component<SponsorViewProps, {}> {
         let silver = this.props.sponsors.silverSponsors.map(extract);
         let bronze = this.props.sponsors.bronzeSponsors.map(extract);
         return (
-            <div>
-                <SponsorRow color="rgba(207, 181, 59, .2)" category="Gold" width={80} sponsors={gold} ids={this.props.sponsors.goldSponsors} logoUrl={logoUrl} />
-                <SponsorRow color="rgba(230, 232, 250, .2)" category="Silver" width={60} sponsors={silver} ids={this.props.sponsors.silverSponsors} logoUrl={logoUrl} />
-                <SponsorRow color="rgba(140, 120, 83, .2)" category="Bronze" width={40} sponsors={bronze} ids={this.props.sponsors.bronzeSponsors} logoUrl={logoUrl} />
+            <div style={{ display: "inline-block", border: "1px solid #cccccc" }}>
+                <SponsorRow color="rgba(207, 181, 59, .2)" category="Gold" width={80} sponsors={gold} ids={this.props.sponsors.goldSponsors} logoUrl={logoUrl} onEnter={this.enter} onLeave={this.leave} />
+                <SponsorRow color="rgba(230, 232, 250, .2)" category="Silver" width={60} sponsors={silver} ids={this.props.sponsors.silverSponsors} logoUrl={logoUrl} onEnter={this.enter} onLeave={this.leave} />
+                <SponsorRow color="rgba(140, 120, 83, .2)" category="Bronze" width={40} sponsors={bronze} ids={this.props.sponsors.bronzeSponsors} logoUrl={logoUrl} onEnter={this.enter} onLeave={this.leave} />
+                {this.current && this.currentId && <div style={{ width: "400px", padding: "5px" }}>
+                    <img width={80} style={{ margin: "10px", float: "left" }} src={logoUrl(this.currentId, this.current.logo)} />
+                    <p>{this.current.profile}</p>
+                    <p>Visit us for <a href={this.current.link}>more information</a> about our products and services.</p>
+                </div>}
             </div>);
     }
 }
