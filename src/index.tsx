@@ -112,6 +112,8 @@ async function updateFigures() {
         data.parent.appendChild(elem);
         // Mount the React component on the new element
         ReactDOM.render(<BookApp desc={desc || data.id} id={data.id} src={data.src} action={ract} details={details} />, elem);
+      }).catch((e) => {
+        console.error("Error fetching model from " + url + ": ", e.message);
       });
     }
   } catch (e) {

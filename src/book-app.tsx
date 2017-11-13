@@ -85,35 +85,43 @@ export class BookApp extends React.Component<BookAppProps, {}> {
             return;
         }
         appDebug("Payload = %o", payload);
-        let resp = await fetch(this.props.action.href, {
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            method: "POST",
-            body: JSON.stringify(payload),
-        });
-        let obj = await resp.json() as Siren;
-        let classes = obj.class || ["unknown"];
-        let props: { stdout?: string, trajectories?: Results } = obj.properties || {};
-        appDebug("Siren response: %o", obj);
-        if (classes[0] === "error") {
+        try {
+            let resp = await fetch(this.props.action.href, {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                method: "POST",
+                body: JSON.stringify(payload),
+            });
+            let obj = await resp.json() as Siren;
+            let classes = obj.class || ["unknown"];
+            let props: { stdout?: string, trajectories?: Results } = obj.properties || {};
+            appDebug("Siren response: %o", obj);
+            if (classes[0] === "error") {
+                this.outcome = {
+                    type: "failure",
+                    log: props.stdout,
+                } as Failure;
+            } else if (classes[0] === "result") {
+                this.outcome = {
+                    type: "success",
+                    results: props.trajectories,
+                } as Success;
+            } else {
+                this.outcome = {
+                    type: "failure",
+                    log: "Unrecognized response from server: " + JSON.stringify(obj),
+                };
+            }
+        } catch (e) {
             this.outcome = {
                 type: "failure",
-                log: props.stdout,
+                log: e.message,
             } as Failure;
-        } else if (classes[0] === "result") {
-            this.outcome = {
-                type: "success",
-                results: props.trajectories,
-            } as Success;
-        } else {
-            this.outcome = {
-                type: "failure",
-                log: "Unrecognized response from server: " + JSON.stringify(obj),
-            };
+        } finally {
+            this.running = false;
         }
-        this.running = false;
     }
     constructor(props: BookAppProps, context?: {}) {
         super(props, context);
@@ -142,7 +150,7 @@ export class BookApp extends React.Component<BookAppProps, {}> {
             }
         }
         return (
-            <div className="figure">
+            <div className="figure" style={{ display: "inline-block" }} >
                 <div className="ui segment tight left-justified">
                     <div className="ui accordion" style={{ width: "100%", marginBottom: "2px", display: "flex", justifyContent: "space-around", flexWrap: "wrap" }}>
                         <div style={{ width: "100%" }} className={"title" + (this.open ? " active" : "")} onClick={() => this.open = !this.open}>

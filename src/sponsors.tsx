@@ -23,7 +23,6 @@ export interface SponsorViewProps {
 }
 
 export interface SponsorRowProps {
-    color: string;
     category: string;
     ids: string[];
     width: number;
@@ -36,7 +35,7 @@ export interface SponsorRowProps {
 export class SponsorRow extends React.Component<SponsorRowProps, {}> {
     render() {
         return (
-            <div className="ui text menu" style={{ backgroundColor: this.props.color, margin: "0px", paddingTop: "5px", paddingBottom: "5px", display: "flex", flexWrap: "wrap" }}>
+            <div className="ui text menu" style={{ margin: "0px", paddingTop: "5px", paddingBottom: "5px", display: "flex", flexWrap: "wrap" }}>
                 <span className="blue item level" style={{ width: "4em" }} >
                     {this.props.category}
                 </span>
@@ -85,16 +84,23 @@ export class SponsorView extends React.Component<SponsorViewProps, {}> {
         let silver = this.props.sponsors.silverSponsors.map(extract);
         let bronze = this.props.sponsors.bronzeSponsors.map(extract);
         return (
-            <div className="ui segment tight">
-                <div>
-                    <div style={{ display: "inline-block" }}>
-                        <div className="ui attached message">
-                            <div className="header">Sponsors</div>
-                        </div>
+            <div className="ui segment raised" style={{ display: "inline-block" }}>
+                <div className="content">
+                    <div >
                         <div style={{ borderLeft: "1px solid #ccccc" }}>
-                            <SponsorRow color="rgba(207, 181, 59, .2)" category="Gold" width={80} sponsors={gold} ids={this.props.sponsors.goldSponsors} logoUrl={logoUrl} onEnter={this.enter} onLeave={this.leave} />
-                            <SponsorRow color="rgba(230, 232, 250, .2)" category="Silver" width={60} sponsors={silver} ids={this.props.sponsors.silverSponsors} logoUrl={logoUrl} onEnter={this.enter} onLeave={this.leave} />
-                            <SponsorRow color="rgba(140, 120, 83, .2)" category="Bronze" width={40} sponsors={bronze} ids={this.props.sponsors.bronzeSponsors} logoUrl={logoUrl} onEnter={this.enter} onLeave={this.leave} />
+                            <div className="ui raised segment" style={{ backgroundColor: "rgba(207, 181, 59, .2)" }} >
+                                <a className="ui blue ribbon label">Gold Sponsors</a>
+                                <SponsorRow category="Gold" width={80} sponsors={gold} ids={this.props.sponsors.goldSponsors} logoUrl={logoUrl} onEnter={this.enter} onLeave={this.leave} />
+                            </div>
+                            <div className="ui raised segment" style={{ backgroundColor: "rgba(230, 232, 250, .2)" }}>
+                                <a className="ui blue ribbon label">Silver Sponsors</a>
+                                <SponsorRow category="Silver" width={60} sponsors={silver} ids={this.props.sponsors.silverSponsors} logoUrl={logoUrl} onEnter={this.enter} onLeave={this.leave} />
+                            </div>
+                            <div className="ui raised segment" style={{ backgroundColor: "rgba(140, 120, 83, .2)" }}>
+                                <a className="ui blue ribbon label">Bronze Sponsors</a>
+                                <SponsorRow category="Bronze" width={40} sponsors={bronze} ids={this.props.sponsors.bronzeSponsors} logoUrl={logoUrl} onEnter={this.enter} onLeave={this.leave} />
+                            </div>
+
                             {this.current && this.currentId && <div style={{ width: "400px", padding: "5px" }}>
                                 <img width={80} style={{ margin: "10px", float: "left" }} src={logoUrl(this.currentId, this.current.logo)} />
                                 <p>{this.current.profile}</p>
