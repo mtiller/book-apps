@@ -3,6 +3,8 @@ import * as template from 'url-template';
 import { observable } from 'mobx';
 import { observer } from 'mobx-react';
 
+declare var $: any;
+
 export interface SponsorData {
     name: string;
     profile: string;
@@ -32,6 +34,36 @@ export interface SponsorRowProps {
     onLeave: () => void;
 }
 
+export interface SponsorItemProps {
+    sponsor: SponsorData;
+    width: number;
+    src: string;
+}
+
+export class SponsorItem extends React.Component<SponsorItemProps, {}> {
+    componentDidMount() {
+        $('.button').popup({ inline: true });
+        $('.thumbnail').popup({ inline: true });
+    }
+    render() {
+        return (
+            <div key={this.props.sponsor.name} className="blue item level"
+                style={{ display: "flex", flexDirection: "column", justifyContent: "space-around", marginLeft: "5px", marginRight: "5px" }}>
+                <a href={this.props.sponsor.link}>
+                    <img className="thumbnail thumbshadow" width={this.props.width}
+                        src={this.props.src} />
+                    <div className="ui special popup">
+                        <div style={{ width: "400px", padding: "5px" }}>
+                            <img width={this.props.width * 2} style={{ margin: "10px", float: "left" }} src={this.props.src} />
+                            <p>{this.props.sponsor.profile}</p>
+                            <p>Visit us for <a href={this.props.sponsor.link}>more information</a> about our products and services.</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        );
+    }
+}
 export class SponsorRow extends React.Component<SponsorRowProps, {}> {
     render() {
         return (
@@ -39,16 +71,7 @@ export class SponsorRow extends React.Component<SponsorRowProps, {}> {
                 <span className="blue item level" style={{ width: "4em" }} >
                     {this.props.category}
                 </span>
-                {this.props.sponsors.map((sponsor, i) => {
-                    return (
-                        <div key={sponsor.name} className="blue item level" onMouseEnter={() => this.props.onEnter(sponsor, this.props.ids[i])} onMouseLeave={this.props.onLeave}
-                            style={{ display: "flex", flexDirection: "column", justifyContent: "space-around", marginLeft: "5px", marginRight: "5px" }}>
-                            <a href={sponsor.link}>
-                                <img className="thumbnail thumbshadow" width={this.props.width}
-                                    src={this.props.logoUrl(this.props.ids[i], sponsor.logo)} />
-                            </a>
-                        </div>);
-                })}
+                {this.props.sponsors.map((sponsor, i) => <SponsorItem key={sponsor.name} sponsor={sponsor} width={this.props.width} src={this.props.logoUrl(this.props.ids[i], sponsor.logo)} />)}
             </div>);
     }
 }
