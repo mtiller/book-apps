@@ -69,7 +69,8 @@ export class SponsorView extends React.Component<SponsorViewProps, {}> {
     }
 
     leave = (): void => {
-        // this.current = null;
+        this.current = null;
+        this.currentId = null;
     }
 
     render() {
@@ -84,15 +85,24 @@ export class SponsorView extends React.Component<SponsorViewProps, {}> {
         let silver = this.props.sponsors.silverSponsors.map(extract);
         let bronze = this.props.sponsors.bronzeSponsors.map(extract);
         return (
-            <div style={{ display: "inline-block", border: "1px solid #cccccc" }}>
-                <SponsorRow color="rgba(207, 181, 59, .2)" category="Gold" width={80} sponsors={gold} ids={this.props.sponsors.goldSponsors} logoUrl={logoUrl} onEnter={this.enter} onLeave={this.leave} />
-                <SponsorRow color="rgba(230, 232, 250, .2)" category="Silver" width={60} sponsors={silver} ids={this.props.sponsors.silverSponsors} logoUrl={logoUrl} onEnter={this.enter} onLeave={this.leave} />
-                <SponsorRow color="rgba(140, 120, 83, .2)" category="Bronze" width={40} sponsors={bronze} ids={this.props.sponsors.bronzeSponsors} logoUrl={logoUrl} onEnter={this.enter} onLeave={this.leave} />
-                {this.current && this.currentId && <div style={{ width: "400px", padding: "5px" }}>
-                    <img width={80} style={{ margin: "10px", float: "left" }} src={logoUrl(this.currentId, this.current.logo)} />
-                    <p>{this.current.profile}</p>
-                    <p>Visit us for <a href={this.current.link}>more information</a> about our products and services.</p>
-                </div>}
+            <div className="ui segment tight">
+                <div>
+                    <div style={{ display: "inline-block" }}>
+                        <div className="ui attached message">
+                            <div className="header">Sponsors</div>
+                        </div>
+                        <div style={{ borderLeft: "1px solid #ccccc" }}>
+                            <SponsorRow color="rgba(207, 181, 59, .2)" category="Gold" width={80} sponsors={gold} ids={this.props.sponsors.goldSponsors} logoUrl={logoUrl} onEnter={this.enter} onLeave={this.leave} />
+                            <SponsorRow color="rgba(230, 232, 250, .2)" category="Silver" width={60} sponsors={silver} ids={this.props.sponsors.silverSponsors} logoUrl={logoUrl} onEnter={this.enter} onLeave={this.leave} />
+                            <SponsorRow color="rgba(140, 120, 83, .2)" category="Bronze" width={40} sponsors={bronze} ids={this.props.sponsors.bronzeSponsors} logoUrl={logoUrl} onEnter={this.enter} onLeave={this.leave} />
+                            {this.current && this.currentId && <div style={{ width: "400px", padding: "5px" }}>
+                                <img width={80} style={{ margin: "10px", float: "left" }} src={logoUrl(this.currentId, this.current.logo)} />
+                                <p>{this.current.profile}</p>
+                                <p>Visit us for <a href={this.current.link}>more information</a> about our products and services.</p>
+                            </div>}
+                        </div>
+                    </div>
+                </div>
             </div>);
     }
 }
