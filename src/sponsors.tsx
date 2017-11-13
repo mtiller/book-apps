@@ -1,6 +1,5 @@
 import * as React from 'react';
 import * as template from 'url-template';
-import { observable } from 'mobx';
 import { observer } from 'mobx-react';
 
 declare var $: any;
@@ -30,8 +29,6 @@ export interface SponsorRowProps {
     width: number;
     sponsors: SponsorData[];
     logoUrl: (sponsor: string, logo: string) => string;
-    onEnter: (sponsor: SponsorData, id: string) => void;
-    onLeave: () => void;
 }
 
 export interface SponsorItemProps {
@@ -78,21 +75,8 @@ export class SponsorRow extends React.Component<SponsorRowProps, {}> {
 
 @observer
 export class SponsorView extends React.Component<SponsorViewProps, {}> {
-    @observable private current: SponsorData | null = null;
-    @observable private currentId: string | null = null;
-
     constructor(props: SponsorViewProps, context?: {}) {
         super(props, context);
-    }
-
-    enter = (sponsor: SponsorData, id: string): void => {
-        this.current = sponsor;
-        this.currentId = id;
-    }
-
-    leave = (): void => {
-        this.current = null;
-        this.currentId = null;
     }
 
     render() {
@@ -110,25 +94,20 @@ export class SponsorView extends React.Component<SponsorViewProps, {}> {
             <div className="ui segment raised" style={{ display: "inline-block" }}>
                 <div className="content">
                     <div >
+                        <h2>Sponsors</h2>
                         <div style={{ borderLeft: "1px solid #ccccc" }}>
                             <div className="ui raised segment" style={{ backgroundColor: "rgba(207, 181, 59, .2)" }} >
                                 <a className="ui blue ribbon label">Gold Sponsors</a>
-                                <SponsorRow category="Gold" width={80} sponsors={gold} ids={this.props.sponsors.goldSponsors} logoUrl={logoUrl} onEnter={this.enter} onLeave={this.leave} />
+                                <SponsorRow category="Gold" width={80} sponsors={gold} ids={this.props.sponsors.goldSponsors} logoUrl={logoUrl} />
                             </div>
                             <div className="ui raised segment" style={{ backgroundColor: "rgba(230, 232, 250, .2)" }}>
                                 <a className="ui blue ribbon label">Silver Sponsors</a>
-                                <SponsorRow category="Silver" width={60} sponsors={silver} ids={this.props.sponsors.silverSponsors} logoUrl={logoUrl} onEnter={this.enter} onLeave={this.leave} />
+                                <SponsorRow category="Silver" width={60} sponsors={silver} ids={this.props.sponsors.silverSponsors} logoUrl={logoUrl} />
                             </div>
                             <div className="ui raised segment" style={{ backgroundColor: "rgba(140, 120, 83, .2)" }}>
                                 <a className="ui blue ribbon label">Bronze Sponsors</a>
-                                <SponsorRow category="Bronze" width={40} sponsors={bronze} ids={this.props.sponsors.bronzeSponsors} logoUrl={logoUrl} onEnter={this.enter} onLeave={this.leave} />
+                                <SponsorRow category="Bronze" width={40} sponsors={bronze} ids={this.props.sponsors.bronzeSponsors} logoUrl={logoUrl} />
                             </div>
-
-                            {this.current && this.currentId && <div style={{ width: "400px", padding: "5px" }}>
-                                <img width={80} style={{ margin: "10px", float: "left" }} src={logoUrl(this.currentId, this.current.logo)} />
-                                <p>{this.current.profile}</p>
-                                <p>Visit us for <a href={this.current.link}>more information</a> about our products and services.</p>
-                            </div>}
                         </div>
                     </div>
                 </div>
