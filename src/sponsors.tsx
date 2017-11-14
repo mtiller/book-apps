@@ -1,6 +1,5 @@
 import * as React from 'react';
 import * as template from 'url-template';
-import { observer } from 'mobx-react';
 
 declare var $: any;
 
@@ -73,7 +72,6 @@ export class SponsorRow extends React.Component<SponsorRowProps, {}> {
     }
 }
 
-@observer
 export class SponsorView extends React.Component<SponsorViewProps, {}> {
     constructor(props: SponsorViewProps, context?: {}) {
         super(props, context);
